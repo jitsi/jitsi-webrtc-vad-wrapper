@@ -1,0 +1,14 @@
+/classes
+*.swp
+dist
+*.class
+*.jar
+
+.idea/*
+webrtcvadwrapper.iml
+
+target/*
+cmake-build/*
+cmake-build-debug/*
+
+libfvad/*
