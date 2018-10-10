@@ -5,7 +5,7 @@ dist
 *.jar
 
 .idea/*
-webrtcvadwrapper.iml
+*.iml
 
 target/*
 cmake-build/*

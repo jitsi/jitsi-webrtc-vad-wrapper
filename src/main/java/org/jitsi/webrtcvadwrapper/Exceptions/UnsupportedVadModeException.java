@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package org.jitsi.webrtcvadwrapper;
+package org.jitsi.webrtcvadwrapper.Exceptions;
+
+import org.jitsi.webrtcvadwrapper.*;
 
 /**
- * This exception is thrown when the native {@link WebRTCVad} has already
- * deallocated its memory, making it unusable.
+ * This exception will be thrown when the {@link WebRTCVad}
+ * is given a vad mode which is invalid.
  *
  * @author Nik Vaessen
  */
-public class VadClosedException extends Exception
+public class UnsupportedVadModeException
+    extends IllegalArgumentException
 {
 }

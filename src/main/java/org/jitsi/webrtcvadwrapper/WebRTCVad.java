@@ -16,6 +16,11 @@
 
 package org.jitsi.webrtcvadwrapper;
 
+import org.jitsi.webrtcvadwrapper.Exceptions.*;
+
+import java.util.*;
+import java.util.stream.*;
+
 /**
  * This class encapsulates the native WebRTCVad library, useful for doing
  * voice activity detection on mono, signed 16bit PCM audio files. Supported
@@ -31,6 +36,68 @@ public class WebRTCVad
     static
     {
         System.loadLibrary("webrtcvadwrapper");
+    }
+
+    /**
+     * The integer values representing valid modes for the VAD detector
+     */
+    private final static int[] validModes = new int[] {0, 1, 2, 3};
+
+    /**
+     * The integer values representing valid sample rates (in Hz) of the audio
+     */
+    private final static int[] validSampleRates
+        = new int[] {8000, 16000, 32000, 48000};
+
+    /**
+     * Check whether a given integer value is a valid mode accepted by the VAD
+     *
+     * @param mode the integer value
+     * @return true when the integer value is a valid mode, false otherwise
+     */
+    public static boolean validVadMode(int mode)
+    {
+        return Arrays
+            .stream(validModes)
+            .anyMatch(validMode -> validMode == mode);
+    }
+
+    /**
+     * Check whether a given sample rate (in Hz) is valid for this VAD
+     *
+     * @param sampleRate the sample rate in Hz
+     * @return true when the sample rate is valid, false otherwise
+     */
+    public static boolean validSampleRate(int sampleRate)
+    {
+        return Arrays
+            .stream(validSampleRates)
+            .anyMatch(rate -> rate == sampleRate);
+    }
+
+    /**
+     * Get an array of valid audio segment lengths for a given sample rate.
+     *
+     * @param sampleRate the sample rate
+     * @return the valid audio segments lengths for the given sample rate.
+     * @throws UnsupportedSampleRateException when the given sample rate is
+     * invalid.
+     */
+    public static int[] getValidAudioSegmentLengths(int sampleRate)
+        throws UnsupportedSampleRateException
+    {
+        if(!validSampleRate(sampleRate))
+        {
+            throw new UnsupportedSampleRateException();
+        }
+
+        int ms10Length = sampleRate / 100;
+
+        return new int[] {
+            ms10Length,
+            ms10Length * 2,
+            ms10Length * 3
+        };
     }
 
     /**
@@ -77,9 +144,16 @@ public class WebRTCVad
 
     /**
      * Store a pointer to the native Vad object. This variable is accessed
-     * directly by native code.
+     * directly by native code. DO NOT TOUCH.
      */
     private long nativeVadPointer;
+
+    /**
+     * The valid sample rates of the audio which will be given. This is stored
+     * so that we can check if a given audio segment has the correct length
+     * before sending it to the native code, which will create more overhead.
+     */
+    private final IntStream validAudioSampleLengthsStream;
 
     /**
      * Create an object wrapping a native WebRTCVad object which is
@@ -97,9 +171,25 @@ public class WebRTCVad
      * @param sampleRate the sample rate of the audio which will be given
      * @param mode the mode of the WebRTCVad. Ranges from 0 to 3, with 0 being
      * very selective and 2 being very aggressive.
+     * @throws UnsupportedSampleRateException when the given sample rate is
+     * invalid
+     * @throws UnsupportedVadModeException when the given mode is invalid
      */
     public WebRTCVad(int sampleRate, int mode)
+        throws UnsupportedSampleRateException, UnsupportedVadModeException
     {
+        if(!validSampleRate(sampleRate))
+        {
+            throw new UnsupportedSampleRateException();
+        }
+        if(!validVadMode(mode))
+        {
+            throw new UnsupportedVadModeException();
+        }
+
+        validAudioSampleLengthsStream
+            = Arrays.stream(getValidAudioSegmentLengths(sampleRate));
+
         nativeOpen(sampleRate, mode);
     }
 
@@ -151,24 +241,28 @@ public class WebRTCVad
      *
      * @param audioSample the audio sample
      * @return true when speech was detected in this sample, false otherwise.
-     * @throws UnsupportedFrameLengthException when the length of the audio was
-     * incorrect.
+     * @throws UnsupportedSegmentLengthException when the length of the audio
+     * was incorrect.
      * @throws VadClosedException when the native object was already closed.
      */
     public boolean isSpeech(int[] audioSample)
-        throws UnsupportedFrameLengthException,
+        throws UnsupportedSegmentLengthException,
                VadClosedException
     {
         if(!nativeIsOpen())
         {
             throw new VadClosedException();
         }
+        if(!isValidLength(audioSample))
+        {
+            throw new UnsupportedSegmentLengthException();
+        }
 
         int result =  nativeIsSpeech(audioSample);
 
         if(result < 0)
         {
-            throw new UnsupportedFrameLengthException();
+            throw new UnsupportedSegmentLengthException();
         }
 
         return result == 1;
@@ -178,10 +272,35 @@ public class WebRTCVad
      * @see WebRTCVad#isSpeech(int[])
      */
     public boolean isSpeech(double[] audioSample)
-        throws UnsupportedFrameLengthException,
+        throws UnsupportedSegmentLengthException,
                VadClosedException
     {
         return isSpeech(convertPCMAudioTo16bitInt(audioSample));
+    }
+
+    /**
+     * Check whether a given audio segment has the correct length this
+     * {@link WebRTCVad} can accept.
+     *
+     * @param audioSegment the audio segment as an array of integers
+     * @return true when the array has the correct length, false otherwise
+     */
+    protected boolean isValidLength(int[] audioSegment)
+    {
+        return isValidLength(audioSegment.length);
+    }
+
+    /**
+     * Check whether a given length is a valid length for an audio segment
+     * array this {@link WebRTCVad} can accept.
+     *
+     * @param length the length of the audio array
+     * @return true is the length is valid, false otherwise
+     */
+    protected boolean isValidLength(int length)
+    {
+        return validAudioSampleLengthsStream.
+            anyMatch(validLength -> validLength == length);
     }
 
 }

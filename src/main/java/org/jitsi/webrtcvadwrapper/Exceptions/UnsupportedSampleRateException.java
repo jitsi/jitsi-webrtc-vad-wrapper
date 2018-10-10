@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package org.jitsi.webrtcvadwrapper;
+package org.jitsi.webrtcvadwrapper.Exceptions;
+
+import org.jitsi.webrtcvadwrapper.*;
 
 /**
- * This exception is thrown when the {@link WebRTCVad} is asked
- * to detect speech on an audio sample with an incorrect length given the
- * sample frequency.
+ * This exception will be thrown when the {@link WebRTCVad}
+ * is given a sample rate which is invalid.
  *
  * @author Nik Vaessen
  */
-public class UnsupportedFrameLengthException extends Exception
+public class UnsupportedSampleRateException
+    extends IllegalArgumentException
 {
 }
