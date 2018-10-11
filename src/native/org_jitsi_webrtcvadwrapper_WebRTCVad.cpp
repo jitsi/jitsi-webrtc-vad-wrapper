@@ -15,7 +15,7 @@
  */
 
 #include <iostream>
-#include "webrtcvadwrapper_WebRTCVad.h"
+#include "org_jitsi_webrtcvadwrapper_WebRTCVad.h"
 #include "fvad.h"
 
 const static char* VARIABLE_NAME_VAD_POINTER = "nativeVadPointer";
@@ -49,7 +49,7 @@ Fvad* getPointerToVadObject(JNIEnv* env, jobject thisObj)
     return reinterpret_cast<Fvad*>((*env).GetLongField(thisObj, fieldIDVadPtr));
 }
 
-void Java_webrtcvadwrapper_WebRTCVad_nativeOpen(
+void Java_org_jitsi_webrtcvadwrapper_WebRTCVad_nativeOpen(
         JNIEnv* env,
         jobject thisObj,
         jint sampleRate,
@@ -65,7 +65,7 @@ void Java_webrtcvadwrapper_WebRTCVad_nativeOpen(
     setPointerToVadObject(env, thisObj, vadPtr);
 }
 
-void Java_webrtcvadwrapper_WebRTCVad_nativeClose(
+void Java_org_jitsi_webrtcvadwrapper_WebRTCVad_nativeClose(
         JNIEnv* env,
         jobject thisObj)
 {
@@ -79,7 +79,7 @@ void Java_webrtcvadwrapper_WebRTCVad_nativeClose(
     setPointerToVadObject(env, thisObj, nullptr);
 }
 
-jboolean Java_webrtcvadwrapper_WebRTCVad_nativeIsOpen(JNIEnv* env, jobject thisObj)
+jboolean Java_org_jitsi_webrtcvadwrapper_WebRTCVad_nativeIsOpen(JNIEnv* env, jobject thisObj)
 {
     Fvad* vadPrt = getPointerToVadObject(env, thisObj);
     if(vadPrt)
@@ -92,7 +92,7 @@ jboolean Java_webrtcvadwrapper_WebRTCVad_nativeIsOpen(JNIEnv* env, jobject thisO
     }
 }
 
-jint Java_webrtcvadwrapper_WebRTCVad_nativeIsSpeech(
+jint Java_org_jitsi_webrtcvadwrapper_WebRTCVad_nativeIsSpeech(
         JNIEnv* env,
         jobject thisObj,
         jintArray javaAudioSample)

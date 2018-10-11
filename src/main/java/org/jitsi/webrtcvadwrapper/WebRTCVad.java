@@ -35,7 +35,14 @@ public class WebRTCVad
      */
     static
     {
-        System.loadLibrary("webrtcvadwrapper");
+        try
+        {
+            System.loadLibrary("webrtcvadwrapper");
+        }
+        catch (UnsatisfiedLinkError e)
+        {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -153,7 +160,7 @@ public class WebRTCVad
      * so that we can check if a given audio segment has the correct length
      * before sending it to the native code, which will create more overhead.
      */
-    private final IntStream validAudioSampleLengthsStream;
+    private final int[] validAudioSampleLengths;
 
     /**
      * Create an object wrapping a native WebRTCVad object which is
@@ -187,8 +194,8 @@ public class WebRTCVad
             throw new UnsupportedVadModeException();
         }
 
-        validAudioSampleLengthsStream
-            = Arrays.stream(getValidAudioSegmentLengths(sampleRate));
+        validAudioSampleLengths
+            = getValidAudioSegmentLengths(sampleRate);
 
         nativeOpen(sampleRate, mode);
     }
@@ -299,7 +306,7 @@ public class WebRTCVad
      */
     protected boolean isValidLength(int length)
     {
-        return validAudioSampleLengthsStream.
+        return Arrays.stream(validAudioSampleLengths).
             anyMatch(validLength -> validLength == length);
     }
 
