@@ -32,4 +32,23 @@ public class CreationTest
         WebRTCVad vad = new WebRTCVad(16000, 1);
         Assert.assertNotNull(vad);
     }
+
+    @Test
+    public void testJigasiSettings()
+    {
+        final int VAD_MODE = 1;
+        final int VAD_AUDIO_HZ = 16000;
+        final int VAD_SEGMENT_SIZE_MS = 20;
+        final int VAD_WINDOW_SIZE_MS = 200;
+        final int VAD_THRESHOLD = 8;
+
+        SpeechDetector speechDetector
+            = new SpeechDetector(VAD_AUDIO_HZ,
+                                 VAD_MODE,
+                                 VAD_SEGMENT_SIZE_MS,
+                                 VAD_WINDOW_SIZE_MS,
+                                 VAD_THRESHOLD);
+
+        Assert.assertNotNull(speechDetector);
+    }
 }

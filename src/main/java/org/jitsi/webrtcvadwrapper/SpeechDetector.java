@@ -146,12 +146,12 @@ public class SpeechDetector
         if(vad.isSpeech(segment))
         {
             speechSegmentCount
-                = Math.max(windowSizeInSegments, speechSegmentCount + 1);
+                = Math.min(windowSizeInSegments, speechSegmentCount + 1);
         }
         else
         {
             speechSegmentCount =
-                Math.min(0, speechSegmentCount - 1);
+                Math.max(0, speechSegmentCount - 1);
         }
 
         List<Integer> values = Arrays
