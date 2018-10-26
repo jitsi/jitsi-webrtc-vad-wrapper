@@ -26,4 +26,8 @@ import org.jitsi.webrtcvadwrapper.*;
  */
 public class VadClosedException extends IllegalStateException
 {
+    public VadClosedException()
+    {
+        super("WebrtcVad#isSpeech was called after it had already been closed");
+    }
 }

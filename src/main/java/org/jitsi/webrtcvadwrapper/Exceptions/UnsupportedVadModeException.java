@@ -18,6 +18,8 @@ package org.jitsi.webrtcvadwrapper.Exceptions;
 
 import org.jitsi.webrtcvadwrapper.*;
 
+import java.util.*;
+
 /**
  * This exception will be thrown when the {@link WebRTCVad}
  * is given a vad mode which is invalid.
@@ -27,4 +29,11 @@ import org.jitsi.webrtcvadwrapper.*;
 public class UnsupportedVadModeException
     extends IllegalArgumentException
 {
+    public UnsupportedVadModeException(int vadMode, int[] valid)
+    {
+        super(String.format("Given VAD mode %d is invalid, needs to be" +
+                                " a value of %s",
+                            vadMode,
+                            Arrays.toString(valid)));
+    }
 }

@@ -18,6 +18,8 @@ package org.jitsi.webrtcvadwrapper.Exceptions;
 
 import org.jitsi.webrtcvadwrapper.*;
 
+import java.util.*;
+
 /**
  * This exception will be thrown when the {@link WebRTCVad}
  * is given a sample rate which is invalid.
@@ -27,4 +29,17 @@ import org.jitsi.webrtcvadwrapper.*;
 public class UnsupportedSampleRateException
     extends IllegalArgumentException
 {
+    /**
+     * Create a new {@link UnsupportedSampleRateException}.
+     *
+     * @param sampleRate the sample rate which was unsupported
+     * @param valid supported sample rates
+     */
+    public UnsupportedSampleRateException(int sampleRate, int[] valid)
+    {
+        super(String.format("Given sample rate %d is invalid, needs to to be " +
+                                "a value of %s",
+                            sampleRate,
+                            Arrays.toString(valid)));
+    }
 }

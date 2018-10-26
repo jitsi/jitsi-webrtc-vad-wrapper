@@ -19,7 +19,6 @@ package org.jitsi.webrtcvadwrapper;
 import org.jitsi.webrtcvadwrapper.Exceptions.*;
 
 import java.util.*;
-import java.util.stream.*;
 
 /**
  * This class encapsulates the native WebRTCVad library, useful for doing
@@ -48,12 +47,12 @@ public class WebRTCVad
     /**
      * The integer values representing valid modes for the VAD detector
      */
-    private final static int[] validModes = new int[] {0, 1, 2, 3};
+    public final static int[] VALID_VAD_MODES = new int[] {0, 1, 2, 3};
 
     /**
      * The integer values representing valid sample rates (in Hz) of the audio
      */
-    private final static int[] validSampleRates
+    public final static int[] VALID_SAMPLE_RATES
         = new int[] {8000, 16000, 32000, 48000};
 
     /**
@@ -62,10 +61,10 @@ public class WebRTCVad
      * @param mode the integer value
      * @return true when the integer value is a valid mode, false otherwise
      */
-    public static boolean validVadMode(int mode)
+    public static boolean isValidVadMode(int mode)
     {
         return Arrays
-            .stream(validModes)
+            .stream(VALID_VAD_MODES)
             .anyMatch(validMode -> validMode == mode);
     }
 
@@ -75,10 +74,10 @@ public class WebRTCVad
      * @param sampleRate the sample rate in Hz
      * @return true when the sample rate is valid, false otherwise
      */
-    public static boolean validSampleRate(int sampleRate)
+    public static boolean isValidSampleRate(int sampleRate)
     {
         return Arrays
-            .stream(validSampleRates)
+            .stream(VALID_SAMPLE_RATES)
             .anyMatch(rate -> rate == sampleRate);
     }
 
@@ -93,9 +92,10 @@ public class WebRTCVad
     public static int[] getValidAudioSegmentLengths(int sampleRate)
         throws UnsupportedSampleRateException
     {
-        if(!validSampleRate(sampleRate))
+        if(!isValidSampleRate(sampleRate))
         {
-            throw new UnsupportedSampleRateException();
+            throw new UnsupportedSampleRateException(sampleRate,
+                                             WebRTCVad.VALID_SAMPLE_RATES);
         }
 
         int ms10Length = sampleRate / 100;
@@ -185,13 +185,15 @@ public class WebRTCVad
     public WebRTCVad(int sampleRate, int mode)
         throws UnsupportedSampleRateException, UnsupportedVadModeException
     {
-        if(!validSampleRate(sampleRate))
+        if(!isValidSampleRate(sampleRate))
         {
-            throw new UnsupportedSampleRateException();
+            throw new UnsupportedSampleRateException(sampleRate,
+                                             WebRTCVad.VALID_SAMPLE_RATES);
         }
-        if(!validVadMode(mode))
+        if(!isValidVadMode(mode))
         {
-            throw new UnsupportedVadModeException();
+            throw new UnsupportedVadModeException(mode,
+                                              WebRTCVad.VALID_VAD_MODES);
         }
 
         validAudioSampleLengths
@@ -262,14 +264,16 @@ public class WebRTCVad
         }
         if(!isValidLength(audioSample))
         {
-            throw new UnsupportedSegmentLengthException();
+            throw new UnsupportedSegmentLengthException(audioSample.length,
+                                                validAudioSampleLengths);
         }
 
         int result =  nativeIsSpeech(audioSample);
 
         if(result < 0)
         {
-            throw new UnsupportedSegmentLengthException();
+            throw new UnsupportedSegmentLengthException(audioSample.length,
+                                                        VALID_VAD_MODES);
         }
 
         return result == 1;

@@ -18,6 +18,8 @@ package org.jitsi.webrtcvadwrapper.Exceptions;
 
 import org.jitsi.webrtcvadwrapper.*;
 
+import java.util.*;
+
 /**
  * This exception is thrown when the {@link WebRTCVad} is asked
  * to detect speech on an audio segment with an incorrect length given the
@@ -26,6 +28,20 @@ import org.jitsi.webrtcvadwrapper.*;
  *
  * @author Nik Vaessen
  */
-public class UnsupportedSegmentLengthException extends IllegalArgumentException
+public class UnsupportedSegmentLengthException
+    extends IllegalArgumentException
 {
+    /**
+     * Create a new {@link UnsupportedSegmentLengthException}.
+     *
+     * @param segmentSize the segment size which was unsupported
+     * @param valid the segments size which are supported
+     */
+    public UnsupportedSegmentLengthException(int segmentSize, int[] valid)
+    {
+        super(String.format("Given segment size %d is invalid, " +
+                                "needs to be a value of %s",
+                            segmentSize,
+                            Arrays.toString(valid)));
+    }
 }

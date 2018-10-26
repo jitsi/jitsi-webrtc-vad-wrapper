@@ -27,4 +27,11 @@ import org.jitsi.webrtcvadwrapper.*;
 public class UnsupportedWindowSizeException
     extends IllegalArgumentException
 {
+    public UnsupportedWindowSizeException(int windowSize, int segmentSize)
+    {
+        super(String.format("Given window size %d is invalid, needs " +
+                                "to be a multiple of %d",
+                            windowSize,
+                            segmentSize));
+    }
 }

@@ -27,4 +27,9 @@ import org.jitsi.webrtcvadwrapper.*;
 public class UnsupportedThresholdException
     extends IllegalArgumentException
 {
+    public UnsupportedThresholdException(int threshold, int min, int max)
+    {
+        super(String.format("Given threshold %d is invalid, needs to be" +
+                                " between %d and %d", threshold, min, max));
+    }
 }

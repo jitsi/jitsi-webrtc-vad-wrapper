@@ -55,6 +55,12 @@ public class SpeechDetector
     private final int windowSizeInSegments;
 
     /**
+     * The sample rate of the audio which will be given to this
+     * {@link SpeechDetector}.
+     */
+    private final int sampleRate;
+
+    /**
      * How many segments in the window contain speech according to the
      * {@link WebRTCVad} VAD detector.
      */
@@ -94,16 +100,22 @@ public class SpeechDetector
                UnsupportedThresholdException
     {
         this.vad = new WebRTCVad(sampleRate, vadMode);
+        this.sampleRate = sampleRate;
 
-        this.segmentSize = sampleRate * (segmentSizeInMs / 1000);
+        this.segmentSize = (int) (sampleRate * (segmentSizeInMs / 1000d));
         if(!this.vad.isValidLength(segmentSize))
         {
-            throw new UnsupportedSegmentLengthException();
+            throw new UnsupportedSegmentLengthException(segmentSize,
+                        WebRTCVad.getValidAudioSegmentLengths(sampleRate));
         }
 
-        if(windowSizeInMs % segmentSizeInMs == 0)
+        // window size needs to be a multiple of a segment so we can fit
+        // x segments in the window
+        if(windowSizeInMs % segmentSizeInMs != 0
+            || windowSizeInMs < segmentSizeInMs)
         {
-            throw new UnsupportedWindowSizeException();
+            throw new UnsupportedWindowSizeException(windowSizeInMs,
+                                                     segmentSizeInMs);
         }
         this.windowSizeInSegments = windowSizeInMs / segmentSizeInMs;
         this.window
@@ -111,7 +123,9 @@ public class SpeechDetector
 
         if(threshold < 0 || threshold > this.windowSizeInSegments)
         {
-            throw new UnsupportedThresholdException();
+            throw new UnsupportedThresholdException(threshold,
+                                                    0,
+                                                    this.windowSizeInSegments);
         }
         this.threshold = threshold;
     }
@@ -125,7 +139,8 @@ public class SpeechDetector
     {
         if(segment.length != this.segmentSize)
         {
-            throw new UnsupportedSegmentLengthException();
+            throw new UnsupportedSegmentLengthException(segment.length,
+                        WebRTCVad.getValidAudioSegmentLengths(this.sampleRate));
         }
 
         if(vad.isSpeech(segment))
