@@ -2,9 +2,9 @@ package org.jitsi.webrtcvadwrapper;
 
 import org.apache.commons.collections4.queue.*;
 import org.jitsi.webrtcvadwrapper.Exceptions.*;
+import org.jitsi.webrtcvadwrapper.audio.*;
 
 import java.util.*;
-import java.util.stream.*;
 
 /**
  * A speech detector to determine whether a certain sequence of audio (a window)
@@ -18,7 +18,7 @@ import java.util.stream.*;
  *
  * @author Nik Vaessen
  */
-public class SpeechDetector
+public class SpeechDetector<T extends AudioSegment>
 {
     /**
      * The voice activity detector used for determining whether there is
@@ -31,7 +31,7 @@ public class SpeechDetector
      * window slides to the next segment, the segment leaving the window
      * is discarded.
      */
-    private final CircularFifoQueue<Integer> window;
+    private final CircularFifoQueue<T> window;
 
     /**
      * The audio segment size which is expected to be given to this
@@ -133,10 +133,12 @@ public class SpeechDetector
     /**
      * Advance the sliding window of the audio by giving it a new segment.
      *
-     * @param segment the segment of audio to add to the window.
+     * @param segmentHolder the segment of audio to add to the window.
      */
-    public void nextSegment(int[] segment)
+    public void nextSegment(T segmentHolder)
     {
+        int[] segment = segmentHolder.to16bitPCM();
+
         if(segment.length != this.segmentSize)
         {
             throw new UnsupportedSegmentLengthException(segment.length,
@@ -154,12 +156,7 @@ public class SpeechDetector
                 Math.max(0, speechSegmentCount - 1);
         }
 
-        List<Integer> values = Arrays
-            .stream(segment)
-            .boxed()
-            .collect(Collectors.toList());
-
-        window.addAll(values);
+        window.add(segmentHolder);
     }
 
     /**
@@ -167,9 +164,9 @@ public class SpeechDetector
      *
      * @return the window of audio segments.
      */
-    public int[] getLatestSegments()
+    public List<T> getLatestSegments()
     {
-        return window.stream().mapToInt(i -> i).toArray();
+        return new ArrayList<>(window);
     }
 
     /**
