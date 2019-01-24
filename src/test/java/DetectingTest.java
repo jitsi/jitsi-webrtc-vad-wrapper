@@ -1,5 +1,5 @@
 /*
- * Copyright @ 2018 Atlassian Pty Ltd
+ * Copyright @ 2019-Present 8x8, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ public class DetectingTest
             audioData = reader.lines()
                 .mapToDouble(Double::valueOf)
                 .toArray();
-                    }
+        }
         catch (IOException e)
         {
             e.printStackTrace();
