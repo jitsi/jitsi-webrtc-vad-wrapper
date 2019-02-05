@@ -25,7 +25,7 @@ for example setting the environment variable `LD_LIBRARY_PATH` to
 
 
 The VAD engine requires mono, 16-bit PCM audio with a sample rate of 8, 16, 32
-or 46 KHz as input. The input should be an audio segment of 10, 20 or 30 
+or 48 KHz as input. The input should be an audio segment of 10, 20 or 30 
 milliseconds. When the audio input is 16 Khz, the input array should thus be 
 either of length 160, 320 or 480. 
 

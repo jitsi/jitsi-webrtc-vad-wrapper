@@ -153,6 +153,7 @@ public class WebRTCVad
      * Store a pointer to the native Vad object. This variable is accessed
      * directly by native code. DO NOT TOUCH.
      */
+    @SuppressWarnings("unused")
     private long nativeVadPointer;
 
     /**
@@ -173,7 +174,7 @@ public class WebRTCVad
      * Valid modes are 0 ("quality"), 1 ("low bitrate"), 2 ("aggressive"), and 3
      * ("very aggressive").  The more aggressive the mode, the higher the
      * probability that active speech is detected, which also increases the
-     * amount of wrong classification.
+     * amount of false positives.
      *
      * @param sampleRate the sample rate of the audio which will be given
      * @param mode the mode of the WebRTCVad. Ranges from 0 to 3, with 0 being
@@ -262,6 +263,8 @@ public class WebRTCVad
         {
             throw new VadClosedException();
         }
+        // TODO potential optimisation by not checking if every sample
+        // has the correct length (and maybe not using streams)
         if(!isValidLength(audioSample))
         {
             throw new UnsupportedSegmentLengthException(audioSample.length,
@@ -273,7 +276,7 @@ public class WebRTCVad
         if(result < 0)
         {
             throw new UnsupportedSegmentLengthException(audioSample.length,
-                                                        VALID_VAD_MODES);
+                                                    validAudioSampleLengths);
         }
 
         return result == 1;

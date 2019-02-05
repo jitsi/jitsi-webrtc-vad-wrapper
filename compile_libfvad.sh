@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 if  [ ! -d "libfvad" ]; then
     git clone git@github.com:dpirch/libfvad.git

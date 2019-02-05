@@ -20,7 +20,7 @@ import java.util.*;
 
 /**
  * An audio segment which is stored as 16 bit signed PCM audio, but represented
- * in byte pairs, where the first byte carries the least significant bytes.
+ * in byte pairs, where the first byte carries the least significant bits.
  *
  * @author Nik Vaessen
  */
