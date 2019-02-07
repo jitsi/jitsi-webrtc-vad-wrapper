@@ -1,18 +1,14 @@
 #!/usr/bin/env bash
 set -e
 
-mkdir -p tmpBuild
+SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+TARGET="$SCRIPTPATH/target_jni_header/"
 
-javac -d tmpBuild src/main/java/org/jitsi/webrtcvadwrapper/WebRTCVad.java src/main/java/org/jitsi/webrtcvadwrapper/Exceptions/*.java
+mkdir -p $TARGET
 
-cd tmpBuild/
+javac -d $TARGET  src/main/java/org/jitsi/webrtcvadwrapper/WebRTCVad.java src/main/java/org/jitsi/webrtcvadwrapper/Exceptions/*.java
+
+cd $TARGET
 javah -d ../src/native/ org.jitsi.webrtcvadwrapper.WebRTCVad
 
-rm org/jitsi/webrtcvadwrapper/*.class
-rm org/jitsi/webrtcvadwrapper/Exceptions/*.class
-rmdir org/jitsi/webrtcvadwrapper/Exceptions
-rmdir org/jitsi/webrtcvadwrapper
-rmdir org/jitsi
-rmdir org
-cd ..
-rmdir tmpBuild
+rm -r $TARGET

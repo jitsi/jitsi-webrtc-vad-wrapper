@@ -253,10 +253,13 @@ public class WebRTCVad
      * @return true when speech was detected in this sample, false otherwise.
      * @throws UnsupportedSegmentLengthException when the length of the audio
      * was incorrect.
+     * @throws NativeLibraryException when the native VAD library fails to
+     * handle the given segment.
      * @throws VadClosedException when the native object was already closed.
      */
     public boolean isSpeech(int[] audioSample)
         throws UnsupportedSegmentLengthException,
+               NativeLibraryException,
                VadClosedException
     {
         if(!nativeIsOpen())
@@ -275,8 +278,7 @@ public class WebRTCVad
 
         if(result < 0)
         {
-            throw new UnsupportedSegmentLengthException(audioSample.length,
-                                                    validAudioSampleLengths);
+            throw new NativeLibraryException();
         }
 
         return result == 1;
@@ -287,6 +289,7 @@ public class WebRTCVad
      */
     public boolean isSpeech(double[] audioSample)
         throws UnsupportedSegmentLengthException,
+               NativeLibraryException,
                VadClosedException
     {
         return isSpeech(convertPCMAudioTo16bitInt(audioSample));
