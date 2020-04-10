@@ -16,6 +16,7 @@
 
 package org.jitsi.webrtcvadwrapper;
 
+import org.jitsi.utils.*;
 import org.jitsi.webrtcvadwrapper.Exceptions.*;
 
 import java.util.*;
@@ -34,13 +35,17 @@ public class WebRTCVad
      */
     static
     {
-        try
-        {
-            System.loadLibrary("webrtcvadwrapper");
-        }
-        catch (UnsatisfiedLinkError e)
-        {
-            e.printStackTrace();
+        try {
+            String os = System.getProperty("os.name");
+
+            if (os.toLowerCase().contains("linux")) {
+                JNIUtils.loadLibrary("fvad", WebRTCVad.class);
+                JNIUtils.loadLibrary("webrtcvadwrapper", WebRTCVad.class);
+            } else {
+                throw new Exception("Unsupported OS: " + os);
+            }
+        } catch (Exception e) {
+            System.out.println("Error loading native library: " + e);
         }
     }
 
