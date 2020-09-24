@@ -105,6 +105,7 @@ jint Java_org_jitsi_webrtcvadwrapper_WebRTCVad_nativeIsSpeech(
     {
         audioSample[i] = javaArray[i];
     }
+    (*env).ReleaseIntArrayElements(javaAudioSample, javaArray, 0);
 
     Fvad* vadPtr = getPointerToVadObject(env, thisObj);
     int result = fvad_process(vadPtr, audioSample, (size_t ) len);
