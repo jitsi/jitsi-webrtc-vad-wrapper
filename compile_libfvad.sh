@@ -7,7 +7,7 @@ TARGET="$SCRIPTPATH/target_libfvad/"
 cd $SCRIPTPATH
 
 if  [ ! -d "libfvad" ]; then
-    git clone git@github.com:dpirch/libfvad.git
+    git clone https://github.com/dpirch/libfvad.git
 fi
 
 cd libfvad
@@ -17,6 +17,7 @@ make
 make install
 
 cd ..
+mkdir -p lib/native/linux-64
 cp "$TARGET/lib/libfvad.so.0.0.0" lib/native/linux-64
 mv lib/native/linux-64/libfvad.so.0.0.0 lib/native/linux-64/libfvad.so
 
